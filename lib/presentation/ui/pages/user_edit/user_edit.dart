@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_ministry/domain/entities/entities.dart';
+import 'package:my_ministry/domain/usecases/usecases.dart';
+import 'package:provider/provider.dart';
 
 class UserEdit extends StatefulWidget {
   final User _user;
@@ -20,27 +22,6 @@ class _UserEditState extends State<UserEdit> {
   Address _addAddress = Address.empty();
 
   final _formKey = GlobalKey<FormState>();
-
-  final _userTypes = <String>[
-    'Unbaptized publisher',
-    'Publisher',
-    'Auxiliary pioneer',
-    'Pioneer',
-    'Fulltime ministry'
-  ];
-
-  final _phoneTypes = <String>[
-    'Mobile',
-    'Home',
-    'Work',
-    'Etc',
-  ];
-
-  final _addressTypes = <String>[
-    'Home',
-    'Work',
-    'Etc',
-  ];
 
 /*   final _phones = <Phone>[
     Phone('+380503607060', PhoneType.mobile, note: 'njdjkfnjsdncjskdncj'),
@@ -94,15 +75,30 @@ class _UserEditState extends State<UserEdit> {
                     ),
                   ),
                   Center(
-                    child: ToggleButtons(
-                        onPressed: (index) {
-                          setState(() {
-                            _user.userType = _getUserTypeByIndex(index);
-                          });
-                        },
-                        children: _getUserTypes(),
-                        borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                        isSelected: _getUserTypesIsSelected()),
+                    child: StreamBuilder<List<UserType>>(
+                      stream: Provider.of<Usecases>(context)
+                          .userUsecases
+                          .getUserTypes(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          var userTypes = snapshot.data ?? [];
+                          return ToggleButtons(
+                              onPressed: (index) {
+                                setState(() {
+                                  _user.userType = _getUserTypeByIndex(index);
+                                });
+                              },
+                              children: _getUserTypes(userTypes),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(12.0)),
+                              isSelected: _getUserTypesIsSelected(userTypes));
+                        } else {
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                      },
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -120,9 +116,23 @@ class _UserEditState extends State<UserEdit> {
                           color: Colors.black12,
                         ),
                         shape: BoxShape.rectangle),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: _getPhones(),
+                    child: StreamBuilder<List<PhoneType>>(
+                      stream: Provider.of<Usecases>(context)
+                          .userUsecases
+                          .getPhoneTypes(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          var phoneTypes = snapshot.data ?? [];
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: _getPhones(phoneTypes),
+                          );
+                        } else {
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                      },
                     ),
                   ),
                   Padding(
@@ -141,9 +151,23 @@ class _UserEditState extends State<UserEdit> {
                           color: Colors.black12,
                         ),
                         shape: BoxShape.rectangle),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: _getAdresses(),
+                    child: StreamBuilder<List<AddressType>>(
+                      stream: Provider.of<Usecases>(context)
+                          .userUsecases
+                          .getAddressTypes(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          var addressTypes = snapshot.data ?? [];
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: _getAdresses(addressTypes),
+                          );
+                        } else {
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                      },
                     ),
                   ),
                   ListTile(
@@ -193,20 +217,21 @@ class _UserEditState extends State<UserEdit> {
     }
   }
 
-  List<Widget> _getUserTypes() {
+  List<Widget> _getUserTypes(List<UserType> userTypes) {
     final widgets = <Widget>[];
-    _userTypes.forEach((type) {
+    userTypes.forEach((type) {
       widgets.add(Padding(
+        key: Key('UserType${type.id}'),
         padding: const EdgeInsets.all(8.0),
-        child: Text(type),
+        child: Text(type.name),
       ));
     });
     return widgets;
   }
 
-  List<bool> _getUserTypesIsSelected() {
+  List<bool> _getUserTypesIsSelected(List<UserType> userTypes) {
     final selecteds = <bool>[];
-    for (var i = 0; i < _userTypes.length; i++) {
+    for (var i = 0; i < userTypes.length; i++) {
       selecteds.add(_user != null && _user.userType == _getUserTypeByIndex(i));
     }
     return selecteds;
@@ -260,7 +285,7 @@ class _UserEditState extends State<UserEdit> {
     } */
   }
 
-  List<Widget> _getPhones() {
+  List<Widget> _getPhones(List<PhoneType> phoneTypes) {
     final widgets = <Widget>[];
     if (_user.phones != null) {
       for (var i = 0; i < _user.phones.length; i++) {
@@ -316,7 +341,7 @@ class _UserEditState extends State<UserEdit> {
         ),
         subtitle: DropdownButton(
             isExpanded: true,
-            items: _getPhoneTypeWidgetList(),
+            items: _getPhoneTypeWidgetList(phoneTypes),
             onChanged: (item) {
               _addAddress.addressType = _getAddressTypeByIndex(item as int);
             }),
@@ -334,16 +359,19 @@ class _UserEditState extends State<UserEdit> {
     return widgets;
   }
 
-  List<DropdownMenuItem<int>> _getPhoneTypeWidgetList() {
+  List<DropdownMenuItem<int>> _getPhoneTypeWidgetList(
+      List<PhoneType> phoneTypes) {
     var dropdownMenuItems = <DropdownMenuItem<int>>[];
-    for (var i = 0; i < _phoneTypes.length; i++) {
-      dropdownMenuItems
-          .add(DropdownMenuItem<int>(child: Text(_phoneTypes[i]), value: i));
+    for (var i = 0; i < phoneTypes.length; i++) {
+      dropdownMenuItems.add(DropdownMenuItem<int>(
+          key: Key('PhoneType${phoneTypes[i].id}'),
+          child: Text(phoneTypes[i].name),
+          value: i));
     }
     return dropdownMenuItems;
   }
 
-  List<Widget> _getAdresses() {
+  List<Widget> _getAdresses(List<AddressType> addressTypes) {
     final widgets = <Widget>[];
     if (_user.addresses != null) {
       for (var i = 0; i < _user.addresses.length; i++) {
@@ -399,7 +427,7 @@ class _UserEditState extends State<UserEdit> {
         ),
         subtitle: DropdownButton(
             isExpanded: true,
-            items: _getAddressTypeWidgetList(),
+            items: _getAddressTypeWidgetList(addressTypes),
             onChanged: (item) {
               _addAddress.addressType = _getAddressTypeByIndex(item as int);
             }),
@@ -417,11 +445,14 @@ class _UserEditState extends State<UserEdit> {
     return widgets;
   }
 
-  List<DropdownMenuItem<int>> _getAddressTypeWidgetList() {
+  List<DropdownMenuItem<int>> _getAddressTypeWidgetList(
+      List<AddressType> addressTypes) {
     var dropdownMenuItems = <DropdownMenuItem<int>>[];
-    for (var i = 0; i < _addressTypes.length; i++) {
-      dropdownMenuItems
-          .add(DropdownMenuItem<int>(child: Text(_addressTypes[i]), value: i));
+    for (var i = 0; i < addressTypes.length; i++) {
+      dropdownMenuItems.add(DropdownMenuItem<int>(
+          key: Key('AddressType${addressTypes[i].id}'),
+          child: Text(addressTypes[i].name),
+          value: i));
     }
     return dropdownMenuItems;
   }

@@ -1,5 +1,9 @@
 name: my_ministry
-description: My ministry
+description: My Ministry - an open source project for managing activities related to the service of God.
+homepage: https://gitlab.com/dimoshka/my-ministry
+repository: https://gitlab.com/dimoshka/my-ministry.git
+issue_tracker: https://gitlab.com/dimoshka/my-ministry/-/issues
+documentation: https://gitlab.com/dimoshka/my-ministry/-/blob/master/README.md
 version: 1.0.0+1
 
 environment:
@@ -12,6 +16,7 @@ dependencies:
   hive: ^1.4.1+1
   hive_flutter: ^0.3.0+2
   flutter_bloc: ^3.2.0
+  provider: ^4.0.5
 
 dev_dependencies:
   #flutter_test:

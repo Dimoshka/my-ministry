@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:my_ministry/data/repositories/dadabase/hive_const.dart';
+import 'package:my_ministry/data/repositories/database/hive_const.dart';
 
 part 'user_type.g.dart';
 
