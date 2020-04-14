@@ -1,3 +1,4 @@
+export 'db_info.dart';
 export 'user.dart';
 export 'user_type.dart';
 export 'phone.dart';

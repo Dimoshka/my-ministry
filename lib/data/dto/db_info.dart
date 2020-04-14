@@ -1,10 +1,10 @@
 import 'package:hive/hive.dart';
 import 'package:my_ministry/data/repositories/database/hive_const.dart';
 
-part 'phone_type.g.dart';
+part 'db_info.g.dart';
 
-@HiveType(typeId: phoneTypeTypeId)
-class PhoneType extends HiveObject {
+@HiveType(typeId: dbInfoTypeId)
+class DbInfo extends HiveObject {
   @HiveField(0)
-  String name;
+  String version;
 }
