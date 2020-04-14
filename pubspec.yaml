@@ -1,5 +1,9 @@
 name: my_ministry
-description: My ministry
+description: My Ministry - an open source project for managing activities related to the service of God.
+homepage: https://gitlab.com/dimoshka/my-ministry
+repository: https://gitlab.com/dimoshka/my-ministry.git
+issue_tracker: https://gitlab.com/dimoshka/my-ministry/-/issues
+documentation: https://gitlab.com/dimoshka/my-ministry/-/blob/master/README.md
 version: 1.0.0+1
 
 environment:
