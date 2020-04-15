@@ -1,11 +1,19 @@
+import 'package:equatable/equatable.dart';
 import 'package:my_ministry/data/dto/dto.dart' as hive;
 
-class AddressType {
-  AddressType.fromHive(hive.AddressType addressTypeHive) {
-    id = addressTypeHive.key as int;
-    name = addressTypeHive.name;
-  }
+class AddressType extends Equatable {
+  AddressType(this.id, this.name);
 
-  int id;
-  String name;
+  AddressType.fromHive(hive.AddressType addressTypeHive)
+      : id = addressTypeHive.key as int,
+        name = addressTypeHive.name;
+
+  final int id;
+  final String name;
+
+  @override
+  List<Object> get props => [id, name];
+
+  @override
+  String toString() => 'AddressType { id: $id, name: $name }';
 }

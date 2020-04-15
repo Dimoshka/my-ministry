@@ -16,28 +16,35 @@ class UserEdit extends StatefulWidget {
 
 class _UserEditState extends State<UserEdit> {
   final bool _isNewUser;
-
-  final User _user;
-  Phone _addPhone = Phone.empty();
-  Address _addAddress = Address.empty();
-
   final _formKey = GlobalKey<FormState>();
+  final int id;
 
-/*   final _phones = <Phone>[
-    Phone('+380503607060', PhoneType.mobile, note: 'njdjkfnjsdncjskdncj'),
-    Phone('+380503607060', PhoneType.mobile)
-  ];
-  final _addresses = <Address>[
-    Address('23 Августа 63', AddressType.home, note: 'njdjkfnjsdncjskdncj'),
-  ];
- */
-  _UserEditState(this._user) : _isNewUser = _user.id == null;
+  String _name;
+  UserType _userType;
+  DateTime _birthday;
+  List<Phone> _phones;
+  List<Address> _addresses;
+
+  Phone _addPhone = Phone.empty();
+  int _addPhoneTypeIndex = 0;
+  Address _addAddress = Address.empty();
+  int _addAddressTypeIndex = 0;
+
+  _UserEditState(User user)
+      : _isNewUser = user.id == null,
+        id = user.id {
+    _name = user.name;
+    _userType = user.userType;
+    _birthday = user.birthday;
+    _phones = user.phones;
+    _addresses = user.addresses;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isNewUser ? 'New user' : _user.name),
+        title: Text(_isNewUser ? 'New user' : _name),
       ),
       body: SafeArea(
         child: Center(
@@ -58,7 +65,7 @@ class _UserEditState extends State<UserEdit> {
                     textInputAction: TextInputAction.done,
                     keyboardType: TextInputType.text,
                     onChanged: (value) {
-                      _user.name = value;
+                      _name = value;
                     },
                     validator: (value) {
                       if (value.isEmpty) {
@@ -85,7 +92,7 @@ class _UserEditState extends State<UserEdit> {
                           return ToggleButtons(
                               onPressed: (index) {
                                 setState(() {
-                                  _user.userType = _getUserTypeByIndex(index);
+                                  _userType = userTypes[index];
                                 });
                               },
                               children: _getUserTypes(userTypes),
@@ -232,73 +239,29 @@ class _UserEditState extends State<UserEdit> {
   List<bool> _getUserTypesIsSelected(List<UserType> userTypes) {
     final selecteds = <bool>[];
     for (var i = 0; i < userTypes.length; i++) {
-      selecteds.add(_user != null && _user.userType == _getUserTypeByIndex(i));
+      selecteds.add(_userType != null &&
+          _userType.id != null &&
+          _userType.id == userTypes[i].id);
     }
     return selecteds;
   }
 
-  UserType _getUserTypeByIndex(int index) {
-    return null;
-    /* switch (index) {
-      case 0:
-        return UserType.unbaptized_publisher;
-      case 1:
-        return UserType.publisher;
-      case 2:
-        return UserType.auxiliary_pioneer;
-      case 3:
-        return UserType.pioneer;
-      case 4:
-        return UserType.fulltime_ministry;
-      default:
-        return UserType.unbaptized_publisher;
-    } */
-  }
-
-  PhoneType _getPhoneTypeByIndex(int index) {
-    return null;
-    /* switch (index) {
-      case 0:
-        return PhoneType.mobile;
-      case 1:
-        return PhoneType.home;
-      case 2:
-        return PhoneType.work;
-      case 3:
-        return PhoneType.etc;
-      default:
-        return PhoneType.mobile;
-    } */
-  }
-
-  AddressType _getAddressTypeByIndex(int index) {
-    return null;
-    /* switch (index) {
-      case 0:
-        return AddressType.home;
-      case 1:
-        return AddressType.work;
-      case 2:
-        return AddressType.etc;
-      default:
-        return AddressType.home;
-    } */
-  }
-
   List<Widget> _getPhones(List<PhoneType> phoneTypes) {
     final widgets = <Widget>[];
-    if (_user.phones != null) {
-      for (var i = 0; i < _user.phones.length; i++) {
-        var phone = _user.phones[i];
+    if (_phones != null) {
+      for (var i = 0; i < _phones.length; i++) {
+        var phone = _phones[i];
         widgets.add(ListTile(
+          onTap: () {},
           title: Text(phone.number),
           isThreeLine: phone.note != null && phone.note.isNotEmpty,
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(phone.phoneType.toString()),
-              Text(phone.note.toString())
-            ],
+            children: phone.note != null
+                ? <Widget>[Text(phone.phoneType.name), Text(phone.note)]
+                : <Widget>[
+                    Text(phone.phoneType.name),
+                  ],
           ),
           trailing: Container(
             constraints: BoxConstraints(maxWidth: 96.0),
@@ -310,7 +273,7 @@ class _UserEditState extends State<UserEdit> {
                     icon: Icon(Icons.delete),
                     onPressed: () {
                       setState(() {
-                        _user.phones.removeAt(i);
+                        _phones.removeAt(i);
                       });
                     }),
               ],
@@ -324,7 +287,7 @@ class _UserEditState extends State<UserEdit> {
       ListTile(
         title: TextFormField(
           onChanged: (value) {
-            _addPhone.number = value;
+            _addPhone = Phone.clone(_addPhone, numberNew: value);
           },
           decoration: InputDecoration(
               labelText: 'Phone number',
@@ -339,17 +302,22 @@ class _UserEditState extends State<UserEdit> {
             return null;
           },
         ),
-        subtitle: DropdownButton(
+        subtitle: DropdownButton<int>(
             isExpanded: true,
             items: _getPhoneTypeWidgetList(phoneTypes),
-            onChanged: (item) {
-              _addAddress.addressType = _getAddressTypeByIndex(item as int);
+            value: _addPhoneTypeIndex,
+            onChanged: (index) {
+              setState(() {
+                _addPhoneTypeIndex = index;
+                _addPhone =
+                    Phone.clone(_addPhone, phoneTypeNew: phoneTypes[index]);
+              });
             }),
         trailing: IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
               setState(() {
-                _user.phones.add(_addPhone);
+                _phones.add(_addPhone);
                 _addPhone = Phone.empty();
               });
             }),
@@ -373,44 +341,44 @@ class _UserEditState extends State<UserEdit> {
 
   List<Widget> _getAdresses(List<AddressType> addressTypes) {
     final widgets = <Widget>[];
-    if (_user.addresses != null) {
-      for (var i = 0; i < _user.addresses.length; i++) {
-        var adress = _user.addresses[i];
-        widgets.add(ListTile(
-          title: Text(adress.location),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    for (var i = 0; i < _addresses.length; i++) {
+      var adress = _addresses[i];
+      widgets.add(ListTile(
+        onTap: () {},
+        title: Text(adress.location),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: adress.note != null
+              ? <Widget>[Text(adress.addressType.name), Text(adress.note)]
+              : <Widget>[
+                  Text(adress.addressType.name),
+                ],
+        ),
+        isThreeLine: adress.note != null && adress.note.isNotEmpty,
+        trailing: Container(
+          constraints: BoxConstraints(maxWidth: 96.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
-              Text(adress.addressType.toString()),
-              Text(adress.note.toString())
+              IconButton(icon: Icon(Icons.edit), onPressed: () {}),
+              IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    setState(() {
+                      _addresses.removeAt(i);
+                    });
+                  }),
             ],
           ),
-          isThreeLine: adress.note != null && adress.note.isNotEmpty,
-          trailing: Container(
-            constraints: BoxConstraints(maxWidth: 96.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget>[
-                IconButton(icon: Icon(Icons.edit), onPressed: () {}),
-                IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () {
-                      setState(() {
-                        _user.addresses.removeAt(i);
-                      });
-                    }),
-              ],
-            ),
-          ),
-        ));
-      }
+        ),
+      ));
     }
 
     widgets.add(
       ListTile(
         title: TextFormField(
           onChanged: (value) {
-            _addAddress.location = value;
+            _addAddress = Address.clone(_addAddress, locationNew: value);
           },
           decoration: InputDecoration(
               labelText: 'Address',
@@ -425,17 +393,22 @@ class _UserEditState extends State<UserEdit> {
             return null;
           },
         ),
-        subtitle: DropdownButton(
+        subtitle: DropdownButton<int>(
             isExpanded: true,
             items: _getAddressTypeWidgetList(addressTypes),
-            onChanged: (item) {
-              _addAddress.addressType = _getAddressTypeByIndex(item as int);
+            value: _addAddressTypeIndex,
+            onChanged: (index) {
+              setState(() {
+                _addAddressTypeIndex = index;
+                _addAddress = Address.clone(_addAddress,
+                    addressTypeNew: addressTypes[index]);
+              });
             }),
         trailing: IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
               setState(() {
-                _user.addresses.add(_addAddress);
+                _addresses.add(_addAddress);
                 _addAddress = Address.empty();
               });
             }),
