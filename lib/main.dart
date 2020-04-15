@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:my_ministry/domain/usecases/usecases.dart';
 import 'package:my_ministry/presentation/ui/pages/users/users.dart';
 import 'package:provider/provider.dart';
@@ -22,6 +23,16 @@ class MyApp extends StatelessWidget {
               theme: ThemeData(
                 primarySwatch: Colors.blue,
               ),
+              localizationsDelegates: [
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: [
+                const Locale('en'),
+                const Locale('ru'),
+                const Locale('uk'),
+              ],
               home: Users(),
             );
           } else {

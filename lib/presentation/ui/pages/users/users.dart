@@ -29,7 +29,7 @@ class _UsersState extends State<Users> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => UserEdit(null)),
+              MaterialPageRoute(builder: (context) => UserEdit()),
             );
           }),
       body: SafeArea(
@@ -71,7 +71,9 @@ class _UsersState extends State<Users> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => UserEdit(user)),
+                              builder: (context) => UserEdit(
+                                    user: user,
+                                  )),
                         );
                       },
                       title: Text(user.name),
