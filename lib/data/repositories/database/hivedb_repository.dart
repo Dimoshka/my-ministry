@@ -7,6 +7,7 @@ import 'package:my_ministry/data/repositories/repositories.dart';
 class HiveDbRepository extends IDbRepository {
   bool _isIneted = false;
 
+  @override
   Future<void> initDb() async {
     await Hive.initFlutter();
     Hive.registerAdapter(DbInfoAdapter());
@@ -26,18 +27,19 @@ class HiveDbRepository extends IDbRepository {
 
   Future<Box<T>> _openBox<T extends HiveObject>(String boxName) async {
     if (Hive.isBoxOpen(boxName)) {
-      return Future.value(Hive.box<T>(boxName));
+      return Future<Box<T>>.value(Hive.box<T>(boxName));
     } else {
-      return await Hive.openBox<T>(boxName);
+      return Hive.openBox<T>(boxName);
     }
   }
 
-  Future<T> _getObject<T extends HiveObject>(String boxName, int key) async {
+  Future<T> _getObject<T extends HiveObject>(String boxName, int key,
+      {T defaultValue}) async {
     if (!_isIneted) {
       await initDb();
     }
     var box = await _openBox<T>(boxName);
-    return Future.value(box.get(key));
+    return Future.value(box.get(key, defaultValue: defaultValue));
   }
 
   Stream<List<T>> _getObjects<T extends HiveObject>(String boxName) async* {
@@ -45,6 +47,8 @@ class HiveDbRepository extends IDbRepository {
       await initDb();
     }
     var box = await _openBox<T>(boxName);
+    var objects = box.values.toList();
+    yield objects;
     var listenable = box.listenable();
     listenable.addListener(() async* {
       yield box.values.toList();
@@ -79,12 +83,12 @@ class HiveDbRepository extends IDbRepository {
 
   @override
   Future<DbInfo> getDbInfo() {
-    return _getObject(dbInfoBoxName, 0);
+    return _getObject<DbInfo>(dbInfoBoxName, 0);
   }
 
   @override
   Future<void> saveDbInfo(DbInfo info) {
-    return _putObject(dbInfoBoxName, 0, info);
+    return _putObject<DbInfo>(dbInfoBoxName, 0, info);
   }
 
   @override
@@ -94,7 +98,7 @@ class HiveDbRepository extends IDbRepository {
 
   @override
   Future<void> deleteUser(int userKey) {
-    return _deleteObject(usersBoxName, userKey);
+    return _deleteObject<User>(usersBoxName, userKey);
   }
 
   @override
@@ -114,16 +118,16 @@ class HiveDbRepository extends IDbRepository {
 
   @override
   Future<int> addUserType(UserType usertype) {
-    return _addObject(userTypesBoxName, usertype);
+    return _addObject<UserType>(userTypesBoxName, usertype);
   }
 
   @override
   Future<int> addAddressType(AddressType addressType) {
-    return _addObject(addressTypesBoxName, addressType);
+    return _addObject<AddressType>(addressTypesBoxName, addressType);
   }
 
   @override
   Future<int> addPhoneType(PhoneType phoneType) {
-    return _addObject(phoneTypesBoxName, phoneType);
+    return _addObject<PhoneType>(phoneTypesBoxName, phoneType);
   }
 }

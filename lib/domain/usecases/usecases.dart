@@ -12,8 +12,8 @@ class Usecases {
     userUsecases = UserUsecase(_dbProvider);
   }
 
-  Future<void> init() {
-    return _dbProvider.initData();
+  Future<void> init() async {
+    await _dbProvider.initData();
   }
 }
 

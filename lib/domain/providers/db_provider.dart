@@ -10,8 +10,8 @@ class DbProvider {
     _db = _repos.dbRepository;
   }
 
-  Future<void> initData() {
-    return _repos.initData();
+  Future<void> initData() async {
+    await _repos.initData();
   }
 
   Stream<List<User>> getUsers() {

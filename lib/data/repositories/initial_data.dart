@@ -12,7 +12,7 @@ class InitialData {
     await _addAddressTypes();
   }
 
-  Future<void> _addUserTypes() {
+  Future<void> _addUserTypes() async {
     final userTypes = <String>[
       'Unbaptized publisher',
       'Publisher',
@@ -21,12 +21,12 @@ class InitialData {
       'Fulltime ministry'
     ];
 
-    userTypes.forEach((element) async {
+    await Future.forEach<String>(userTypes, (element) async {
       await _dbRepository.addUserType(UserType()..name = element);
     });
   }
 
-  Future<void> _addPhoneTypes() {
+  Future<void> _addPhoneTypes() async {
     final phoneTypes = <String>[
       'Mobile',
       'Home',
@@ -34,19 +34,19 @@ class InitialData {
       'Etc',
     ];
 
-    phoneTypes.forEach((element) async {
+    await Future.forEach<String>(phoneTypes, (element) async {
       await _dbRepository.addPhoneType(PhoneType()..name = element);
     });
   }
 
-  Future<void> _addAddressTypes() {
+  Future<void> _addAddressTypes() async {
     final addressTypes = <String>[
       'Home',
       'Work',
       'Etc',
     ];
 
-    addressTypes.forEach((element) async {
+    await Future.forEach<String>(addressTypes, (element) async {
       await _dbRepository.addAddressType(AddressType()..name = element);
     });
   }

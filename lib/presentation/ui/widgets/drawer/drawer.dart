@@ -28,7 +28,8 @@ class _DrawerState extends State<DrawerApp> {
             child: Center(child: Text('My ministry'))),
         ListTile(
           title: Text('Main'),
-          enabled: _selectedMenu == DrawerMenu.main,
+          selected:  _selectedMenu == DrawerMenu.main,
+          enabled: _selectedMenu != DrawerMenu.main,
           onLongPress: () {
             Navigator.push(
               context,
