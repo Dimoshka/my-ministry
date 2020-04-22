@@ -18,12 +18,11 @@ class Address extends Equatable {
         addressType = AddressType.fromHive(addressHive.addressType),
         note = addressHive.note;
 
-  Address.clone(Address address,
-      {String locationNew, AddressType addressTypeNew, String noteNew})
-      : id = address.id,
-        location = locationNew ?? address.location,
-        addressType = addressTypeNew ?? address.addressType,
-        note = noteNew ?? address.note;
+  Address clone(
+      {String locationNew, AddressType addressTypeNew, String noteNew}) {
+    return Address(id, locationNew ?? location, addressTypeNew ?? addressType,
+        noteNew ?? note);
+  }
 
   final int id;
   final String location;

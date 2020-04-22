@@ -2,49 +2,49 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:my_ministry/domain/entities/entities.dart';
 import 'package:my_ministry/domain/usecases/usecases.dart';
-import 'package:my_ministry/presentation/ui/pages/user_edit/user_edit.dart';
+import 'package:my_ministry/presentation/ui/pages/people_edit/people_edit.dart';
 import 'package:my_ministry/presentation/ui/widgets/drawer/drawer.dart';
 import 'package:provider/provider.dart';
 
-class Users extends StatefulWidget {
-  Users({Key key}) : super(key: key);
+class Peoples extends StatefulWidget {
+  Peoples({Key key}) : super(key: key);
 
   @override
-  _UsersState createState() => _UsersState();
+  _PeoplesState createState() => _PeoplesState();
 }
 
-class _UsersState extends State<Users> {
+class _PeoplesState extends State<Peoples> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Users'),
+        title: Text('Peoples'),
       ),
       drawer: Drawer(
         semanticLabel: 'Menu',
-        child: DrawerApp(DrawerMenu.users),
+        child: DrawerApp(DrawerMenu.peoples),
       ),
       floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => UserEdit()),
+              MaterialPageRoute(builder: (context) => PeopleEdit()),
             );
           }),
       body: SafeArea(
-        child: StreamBuilder<List<User>>(
-          stream: Provider.of<Usecases>(context).userUsecases.getUsers(),
+        child: StreamBuilder<List<People>>(
+          stream: Provider.of<Usecases>(context).peopleUsecases.getPeoples(),
           initialData: [],
           builder: (context, snapshot) {
             if (snapshot.error == null &&
                 snapshot.connectionState == ConnectionState.done) {
-              var users = snapshot.data;
+              var peoples = snapshot.data;
               return ListView.builder(
                 shrinkWrap: true,
-                itemCount: users.length,
+                itemCount: peoples.length,
                 itemBuilder: (context, index) {
-                  var user = users[index];
+                  var people = peoples[index];
                   return Dismissible(
                     background: Container(
                       alignment: AlignmentDirectional.centerStart,
@@ -60,24 +60,24 @@ class _UsersState extends State<Users> {
                     direction: DismissDirection.startToEnd,
                     onDismissed: (direction) {
                       Scaffold.of(context).showSnackBar(
-                          SnackBar(content: Text('${user.name} user deleted')));
+                          SnackBar(content: Text('${people.name} people deleted')));
                       Provider.of<Usecases>(context)
-                          .userUsecases
-                          .deleteUser(user);
+                          .peopleUsecases
+                          .deletePeople(people);
                     },
-                    key: Key(user.id.toString()),
+                    key: Key(people.id.toString()),
                     child: ListTile(
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => UserEdit(
-                                    user: user,
+                              builder: (context) => PeopleEdit(
+                                    people: people,
                                   )),
                         );
                       },
-                      title: Text(user.name),
-                      subtitle: Text(user.userType.toString()),
+                      title: Text(people.name),
+                      subtitle: Text(people.peopleType.toString()),
                     ),
                   );
                 },

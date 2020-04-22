@@ -1,28 +1,28 @@
 import 'package:async/src/stream_zip.dart';
 import 'package:my_ministry/domain/entities/entities.dart';
-import 'package:my_ministry/domain/entities/user.dart';
-import 'package:my_ministry/domain/entities/user_type.dart';
+import 'package:my_ministry/domain/entities/people.dart';
+import 'package:my_ministry/domain/entities/people_type.dart';
 import 'package:my_ministry/domain/providers/providers.dart';
 import 'package:my_ministry/domain/usecases/usecases.dart';
 
-class UserUsecase extends IUserUsecases {
+class PeopleUsecase extends IPeopleUsecases {
   final DbProvider _dbProvider;
 
-  UserUsecase(this._dbProvider);
+  PeopleUsecase(this._dbProvider);
 
   @override
-  Stream<List<User>> getUsers() {
-    return _dbProvider.getUsers().map((users) {
-      users.sort((user1, user2) {
+  Stream<List<People>> getPeoples() {
+    return _dbProvider.getPeoples().map((peoples) {
+      peoples.sort((user1, user2) {
         return user1.name.compareTo(user2.name);
       });
-      return users;
+      return peoples;
     });
   }
 
   @override
-  Future<void> deleteUser(User user) {
-    return _dbProvider.deleteUser(user);
+  Future<void> deletePeople(People people) {
+    return _dbProvider.deletePeople(people);
   }
 
   @override
@@ -36,12 +36,12 @@ class UserUsecase extends IUserUsecases {
   }
 
   @override
-  Stream<List<UserType>> getUserTypes() {
-    return _dbProvider.getUserTypes();
+  Stream<List<PeopleType>> getPeopleTypes() {
+    return _dbProvider.getpeopleTypes();
   }
 
   @override
   StreamZip<List<dynamic>> getTypes() {
-    return StreamZip([getUserTypes(), getPhoneTypes(), getAddressTypes()]);
+    return StreamZip([getPeopleTypes(), getPhoneTypes(), getAddressTypes()]);
   }
 }

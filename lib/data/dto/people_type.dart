@@ -1,10 +1,10 @@
 import 'package:hive/hive.dart';
 import 'package:my_ministry/data/repositories/database/hive_const.dart';
 
-part 'user_type.g.dart';
+part 'people_type.g.dart';
 
-@HiveType(typeId: userTypeTypeId)
-class UserType extends HiveObject {
+@HiveType(typeId: peopleTypeTypeId)
+class PeopleType extends HiveObject {
   @HiveField(0)
   String name;
 }

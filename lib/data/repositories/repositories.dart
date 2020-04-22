@@ -26,10 +26,10 @@ abstract class IDbRepository {
   bool isInited();
   Future<DbInfo> getDbInfo();
   Future<void> saveDbInfo(DbInfo info);
-  Stream<List<User>> getUsers();
-  Future<void> deleteUser(int userKey);
-  Stream<List<UserType>> getUserTypes();
-  Future<int> addUserType(UserType usertype);
+  Stream<List<People>> getPeoples();
+  Future<void> deletePeople(int userKey);
+  Stream<List<PeopleType>> getPeopleTypes();
+  Future<int> addPeopleType(PeopleType peopleType);
   Stream<List<PhoneType>> getPhoneTypes();
   Future<int> addPhoneType(PhoneType phoneType);
   Stream<List<AddressType>> getAddressTypes();

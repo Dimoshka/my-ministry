@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_ministry/presentation/ui/pages/main/main.dart';
-import 'package:my_ministry/presentation/ui/pages/users/users.dart';
+import 'package:my_ministry/presentation/ui/pages/peoples/peoples.dart';
 
 class DrawerApp extends StatefulWidget {
   final DrawerMenu _selectedMenu;
@@ -28,9 +28,9 @@ class _DrawerState extends State<DrawerApp> {
             child: Center(child: Text('My ministry'))),
         ListTile(
           title: Text('Main'),
-          selected:  _selectedMenu == DrawerMenu.main,
+          selected: _selectedMenu == DrawerMenu.main,
           enabled: _selectedMenu != DrawerMenu.main,
-          onLongPress: () {
+          onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => Main()),
@@ -38,12 +38,13 @@ class _DrawerState extends State<DrawerApp> {
           },
         ),
         ListTile(
-          title: Text('Users'),
-          enabled: _selectedMenu == DrawerMenu.users,
-          onLongPress: () {
+          title: Text('Peoples'),
+          enabled: _selectedMenu != DrawerMenu.peoples,
+          selected: _selectedMenu == DrawerMenu.peoples,
+          onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => Users()),
+              MaterialPageRoute(builder: (context) => Peoples()),
             );
           },
         )
@@ -54,5 +55,5 @@ class _DrawerState extends State<DrawerApp> {
 
 enum DrawerMenu {
   main,
-  users,
+  peoples,
 }

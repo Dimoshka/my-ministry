@@ -14,29 +14,29 @@ class DbProvider {
     await _repos.initData();
   }
 
-  Stream<List<User>> getUsers() {
-    return _db.getUsers().map((users) {
-      var newUsers = <User>[];
-      users.forEach((user) {
-        newUsers.add(User.fromHive(user));
+  Stream<List<People>> getPeoples() {
+    return _db.getPeoples().map((peoples) {
+      var newUsers = <People>[];
+      peoples.forEach((people) {
+        newUsers.add(People.fromHive(people));
       });
       return newUsers;
     }).asBroadcastStream();
   }
 
-  Future<void> deleteUser(User user) async {
-    if (user == null && user.id == null) {
-      return Future.error('Wrong user data!');
+  Future<void> deletePeople(People people) async {
+    if (people == null && people.id == null) {
+      return Future.error('Wrong people data!');
     } else {
-      return _db.deleteUser(user.id);
+      return _db.deletePeople(people.id);
     }
   }
 
-  Stream<List<UserType>> getUserTypes() {
-    return _db.getUserTypes().map((types) {
-      var newTypes = <UserType>[];
+  Stream<List<PeopleType>> getpeopleTypes() {
+    return _db.getPeopleTypes().map((types) {
+      var newTypes = <PeopleType>[];
       types.forEach((type) {
-        newTypes.add(UserType.fromHive(type));
+        newTypes.add(PeopleType.fromHive(type));
       });
       return newTypes;
     }).asBroadcastStream();

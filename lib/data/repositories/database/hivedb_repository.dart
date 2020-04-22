@@ -11,8 +11,8 @@ class HiveDbRepository extends IDbRepository {
   Future<void> initDb() async {
     await Hive.initFlutter();
     Hive.registerAdapter(DbInfoAdapter());
-    Hive.registerAdapter(UserAdapter());
-    Hive.registerAdapter(UserTypeAdapter());
+    Hive.registerAdapter(PeopleAdapter());
+    Hive.registerAdapter(PeopleTypeAdapter());
     Hive.registerAdapter(PhoneAdapter());
     Hive.registerAdapter(PhoneTypeAdapter());
     Hive.registerAdapter(AddressAdapter());
@@ -92,13 +92,13 @@ class HiveDbRepository extends IDbRepository {
   }
 
   @override
-  Stream<List<User>> getUsers() {
-    return _getObjects<User>(usersBoxName).asBroadcastStream();
+  Stream<List<People>> getPeoples() {
+    return _getObjects<People>(peoplesBoxName).asBroadcastStream();
   }
 
   @override
-  Future<void> deleteUser(int userKey) {
-    return _deleteObject<User>(usersBoxName, userKey);
+  Future<void> deletePeople(int userKey) {
+    return _deleteObject<People>(peoplesBoxName, userKey);
   }
 
   @override
@@ -112,13 +112,13 @@ class HiveDbRepository extends IDbRepository {
   }
 
   @override
-  Stream<List<UserType>> getUserTypes() {
-    return _getObjects<UserType>(userTypesBoxName).asBroadcastStream();
+  Stream<List<PeopleType>> getPeopleTypes() {
+    return _getObjects<PeopleType>(peopleTypesBoxName).asBroadcastStream();
   }
 
   @override
-  Future<int> addUserType(UserType usertype) {
-    return _addObject<UserType>(userTypesBoxName, usertype);
+  Future<int> addPeopleType(PeopleType peopleType) {
+    return _addObject<PeopleType>(peopleTypesBoxName, peopleType);
   }
 
   @override

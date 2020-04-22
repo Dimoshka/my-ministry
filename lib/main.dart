@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:my_ministry/domain/usecases/usecases.dart';
-import 'package:my_ministry/presentation/ui/pages/users/users.dart';
+import 'package:my_ministry/presentation/resources/resources.dart';
+import 'package:my_ministry/presentation/ui/pages/peoples/peoples.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -20,9 +21,7 @@ class MyApp extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.done) {
             return MaterialApp(
               title: 'Flutter Demo',
-              theme: ThemeData(
-                primarySwatch: Colors.blue,
-              ),
+              theme: appTheme,
               localizationsDelegates: [
                 GlobalMaterialLocalizations.delegate,
                 GlobalWidgetsLocalizations.delegate,
@@ -33,7 +32,7 @@ class MyApp extends StatelessWidget {
                 const Locale('ru'),
                 const Locale('uk'),
               ],
-              home: Users(),
+              home: Peoples(),
             );
           } else {
             return Center(

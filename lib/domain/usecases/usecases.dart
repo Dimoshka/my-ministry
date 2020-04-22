@@ -1,15 +1,15 @@
-export 'users/users_usecase.dart';
+export 'peoples/peoples_usecase.dart';
 import 'package:async/async.dart';
 import 'package:my_ministry/domain/entities/entities.dart';
 import 'package:my_ministry/domain/providers/db_provider.dart';
-import 'package:my_ministry/domain/usecases/users/users_usecase.dart';
+import 'package:my_ministry/domain/usecases/peoples/peoples_usecase.dart';
 
 class Usecases {
   final DbProvider _dbProvider;
-  IUserUsecases userUsecases;
+  IPeopleUsecases peopleUsecases;
 
   Usecases() : _dbProvider = DbProvider() {
-    userUsecases = UserUsecase(_dbProvider);
+    peopleUsecases = PeopleUsecase(_dbProvider);
   }
 
   Future<void> init() async {
@@ -17,10 +17,10 @@ class Usecases {
   }
 }
 
-abstract class IUserUsecases {
-  Stream<List<User>> getUsers();
-  Future<void> deleteUser(User user);
-  Stream<List<UserType>> getUserTypes();
+abstract class IPeopleUsecases {
+  Stream<List<People>> getPeoples();
+  Future<void> deletePeople(People people);
+  Stream<List<PeopleType>> getPeopleTypes();
   Stream<List<PhoneType>> getPhoneTypes();
   Stream<List<AddressType>> getAddressTypes();
   StreamZip<List<dynamic>> getTypes();

@@ -18,12 +18,10 @@ class Phone extends Equatable {
         phoneType = PhoneType.fromHive(phoneHive.phoneType),
         note = phoneHive.note;
 
-  Phone.clone(Phone phone,
-      {String numberNew, PhoneType phoneTypeNew, String noteNew})
-      : id = phone.id,
-        number = numberNew ?? phone.number,
-        phoneType = phoneTypeNew ?? phone.phoneType,
-        note = noteNew ?? phone.note;
+  Phone clone({String numberNew, PhoneType phoneTypeNew, String noteNew}) {
+    return Phone(
+        id, numberNew ?? number, phoneTypeNew ?? phoneType, noteNew ?? note);
+  }
 
   final int id;
   final String number;

@@ -7,13 +7,13 @@ class InitialData {
   InitialData(this._dbRepository);
 
   Future<void> init() async {
-    await _addUserTypes();
+    await _addpeopleTypes();
     await _addPhoneTypes();
     await _addAddressTypes();
   }
 
-  Future<void> _addUserTypes() async {
-    final userTypes = <String>[
+  Future<void> _addpeopleTypes() async {
+    final peopleTypes = <String>[
       'Unbaptized publisher',
       'Publisher',
       'Auxiliary pioneer',
@@ -21,8 +21,8 @@ class InitialData {
       'Fulltime ministry'
     ];
 
-    await Future.forEach<String>(userTypes, (element) async {
-      await _dbRepository.addUserType(UserType()..name = element);
+    await Future.forEach<String>(peopleTypes, (element) async {
+      await _dbRepository.addPeopleType(PeopleType()..name = element);
     });
   }
 

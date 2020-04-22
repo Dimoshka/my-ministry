@@ -1,31 +1,25 @@
 import 'package:equatable/equatable.dart';
 import 'package:my_ministry/domain/entities/entities.dart';
 
-abstract class UserEditEvent extends Equatable {
+abstract class PeopleEditEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
 
-class FormDataSubmitEvent extends UserEditEvent {
+class LoadDataEvent extends PeopleEditEvent {}
+
+class FormDataSubmitEvent extends PeopleEditEvent {
   final String name;
-  final UserType userType;
+  final PeopleType peopleType;
   final DateTime birthday;
-  final List<Phone> phones;
-  final List<Address> addresses;
 
-/*  final Phone _addPhone = Phone.empty();
- final int _addPhoneTypeIndex = 0;
- final Address _addAddress = Address.empty();
- final int _addAddressTypeIndex = 0; */
-
-  FormDataSubmitEvent(
-      {this.name, this.userType, this.birthday, this.phones, this.addresses});
+  FormDataSubmitEvent({this.name, this.peopleType, this.birthday});
 
   @override
-  List<Object> get props => [name, userType];
+  List<Object> get props => [name, peopleType.id, birthday];
 }
 
-class PhoneRemoveEvent extends UserEditEvent {
+class PhoneRemoveEvent extends PeopleEditEvent {
   final Phone phone;
 
   PhoneRemoveEvent(this.phone);
@@ -34,7 +28,7 @@ class PhoneRemoveEvent extends UserEditEvent {
   List<Object> get props => [phone];
 }
 
-class AddPhoneChangeEvent extends UserEditEvent {
+class AddPhoneChangeEvent extends PeopleEditEvent {
   final String number;
   final PhoneType phoneType;
   final String note;
@@ -45,9 +39,9 @@ class AddPhoneChangeEvent extends UserEditEvent {
   List<Object> get props => [number, phoneType];
 }
 
-class AddPhoneSubmitEvent extends UserEditEvent {}
+class AddPhoneSubmitEvent extends PeopleEditEvent {}
 
-class AddressRemoveEvent extends UserEditEvent {
+class AddressRemoveEvent extends PeopleEditEvent {
   final Address address;
 
   AddressRemoveEvent(this.address);
@@ -56,7 +50,7 @@ class AddressRemoveEvent extends UserEditEvent {
   List<Object> get props => [address];
 }
 
-class AddAddressChangeEvent extends UserEditEvent {
+class AddAddressChangeEvent extends PeopleEditEvent {
   final String location;
   final AddressType addressType;
   final String note;
@@ -67,6 +61,6 @@ class AddAddressChangeEvent extends UserEditEvent {
   List<Object> get props => [location, location];
 }
 
-class AddAddressSubmitEvent extends UserEditEvent {}
+class AddAddressSubmitEvent extends PeopleEditEvent {}
 
-class FormSubmitEvent extends UserEditEvent {}
+class FormSubmitEvent extends PeopleEditEvent {}
