@@ -32,6 +32,5 @@ class Phone extends Equatable {
   List<Object> get props => [id, number, phoneType, note];
 
   @override
-  String toString() =>
-      'Phone { id: $id, number: $number, phoneType: ${phoneType.toString()}, note: $note }';
+  bool get stringify => true;
 }

@@ -1,6 +1,6 @@
 {
-    "name": "my_ministry",
-    "short_name": "my_ministry",
+    "name": "My ministry",
+    "short_name": "My ministry",
     "start_url": ".",
     "display": "minimal-ui",
     "background_color": "#0175C2",

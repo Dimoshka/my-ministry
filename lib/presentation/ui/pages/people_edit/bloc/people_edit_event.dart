@@ -4,6 +4,9 @@ import 'package:my_ministry/domain/entities/entities.dart';
 abstract class PeopleEditEvent extends Equatable {
   @override
   List<Object> get props => [];
+
+  @override
+  bool get stringify => true;
 }
 
 class LoadDataEvent extends PeopleEditEvent {}
@@ -16,7 +19,7 @@ class FormDataSubmitEvent extends PeopleEditEvent {
   FormDataSubmitEvent({this.name, this.peopleType, this.birthday});
 
   @override
-  List<Object> get props => [name, peopleType.id, birthday];
+  List<Object> get props => [name, peopleType, birthday];
 }
 
 class PhoneRemoveEvent extends PeopleEditEvent {
@@ -58,7 +61,7 @@ class AddAddressChangeEvent extends PeopleEditEvent {
   AddAddressChangeEvent({this.location, this.addressType, this.note});
 
   @override
-  List<Object> get props => [location, location];
+  List<Object> get props => [location, addressType];
 }
 
 class AddAddressSubmitEvent extends PeopleEditEvent {}

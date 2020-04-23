@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:my_ministry/data/repositories/database/hive_const.dart';
 import 'package:my_ministry/domain/entities/entities.dart';
 
 abstract class PeopleEditState extends Equatable {
@@ -7,11 +6,14 @@ abstract class PeopleEditState extends Equatable {
 
   @override
   List<Object> get props => [];
+
+  @override
+  bool get stringify => true;
 }
 
 class LoadingState extends PeopleEditState {}
 
-class UserFormState extends PeopleEditState {
+class PeopleFormState extends PeopleEditState {
   /// Main data
   final PeopleType peopleType;
   final DateTime birthday;
@@ -22,29 +24,44 @@ class UserFormState extends PeopleEditState {
   final List<PhoneType> phoneTypes;
   final List<AddressType> addressTypes;
 
-  final int addPhoneTypeIndex = 0;
-  final int addAddressTypeIndex = 0;
+  final int addPhoneTypeIndex;
+  final int addAddressTypeIndex;
 
   /// Errors
   final String nameError;
   final String peopleTypeError;
+  final String addPhoneError;
+  final String addAddressError;
 
-  UserFormState(this.peopleType, this.birthday, this.phones, this.addresses,
-      this.peopleTypes, this.phoneTypes, this.addressTypes,
-      {this.nameError, this.peopleTypeError});
+  PeopleFormState(
+      this.peopleType,
+      this.birthday,
+      this.phones,
+      this.addresses,
+      this.peopleTypes,
+      this.phoneTypes,
+      this.addressTypes,
+      this.addPhoneTypeIndex,
+      this.addAddressTypeIndex,
+      {this.nameError,
+      this.peopleTypeError,
+      this.addPhoneError,
+      this.addAddressError});
 
   @override
   List<Object> get props => [
-        peopleType.id,
+        peopleType,
         birthday,
-        phones.length,
-        addresses.length,
+        phones,
+        addresses,
         peopleTypes.length,
         phoneTypes.length,
         addressTypes.length,
         addPhoneTypeIndex,
         addAddressTypeIndex,
         nameError,
-        peopleTypeError
+        peopleTypeError,
+        addPhoneError,
+        addAddressError
       ];
 }

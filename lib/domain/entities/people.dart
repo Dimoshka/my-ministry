@@ -45,6 +45,5 @@ class People extends Equatable {
   List<Object> get props => [id, name, peopleType, birthday, phones, addresses];
 
   @override
-  String toString() =>
-      'People { id: $id, name: $name, peopleType: ${peopleType.toString()}, birthday: $birthday, phones: ${phones.toString()}, addresses: ${addresses.toString()} }';
+  bool get stringify => true;
 }

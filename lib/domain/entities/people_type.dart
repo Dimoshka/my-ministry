@@ -15,5 +15,5 @@ class PeopleType extends Equatable {
   List<Object> get props => [id, name];
 
   @override
-  String toString() => 'peopleType { id: $id, name: $name }';
+  bool get stringify => true;
 }

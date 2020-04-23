@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_ministry/domain/entities/entities.dart';
 import 'package:my_ministry/domain/usecases/usecases.dart';
+import 'package:my_ministry/presentation/resources/resources.dart';
 import 'package:my_ministry/presentation/ui/pages/people_edit/bloc/bloc.dart';
 import 'package:provider/provider.dart';
 
@@ -23,17 +24,35 @@ class PeopleEdit extends StatelessWidget {
         ),
         body: SafeArea(
           child: Center(
-            child: BlocBuilder<PeopleEditBloc, PeopleEditState>(
-                builder: (context, state) {
-              final peopleEditBloc = BlocProvider.of<PeopleEditBloc>(context);
-              if (state is LoadingState) {
-                return CircularProgressIndicator();
-              } else if (state is UserFormState) {
-                return _getForm(peopleEditBloc, context, state);
-              } else {
-                return Container();
-              }
-            }),
+            child: BlocListener<PeopleEditBloc, PeopleEditState>(
+              listener: (context, state) {
+                if (state is PeopleFormState &&
+                    (state.nameError != null ||
+                        state.peopleTypeError != null ||
+                        state.addPhoneError != null ||
+                            state.addAddressError != null)) {
+                             
+                  Scaffold.of(context).showSnackBar(SnackBar(
+                      content: Text(state.nameError ??
+                          state.peopleTypeError ??
+                          state.addPhoneError ??
+                          state.addAddressError ??
+                          '')));
+                }
+              },
+              child: BlocBuilder<PeopleEditBloc, PeopleEditState>(
+                  builder: (context, state) {
+                final peopleEditBloc = BlocProvider.of<PeopleEditBloc>(context);
+                if (state is LoadingState) {
+                  return CircularProgressIndicator();
+                } else if (state is PeopleFormState) {
+                  return SingleChildScrollView(
+                      child: _getForm(peopleEditBloc, context, state));
+                } else {
+                  return Container();
+                }
+              }),
+            ),
           ),
         ),
       ),
@@ -41,12 +60,11 @@ class PeopleEdit extends StatelessWidget {
   }
 
   Widget _getForm(PeopleEditBloc peopleEditBloc, BuildContext context,
-      UserFormState state) {
+      PeopleFormState state) {
     return Form(
       key: _formKey,
-      autovalidate: true,
       child: Container(
-        constraints: BoxConstraints(maxWidth: 600.0),
+        constraints: BoxConstraints(maxWidth: maxWidthWidget),
         child: Column(
           mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,34 +85,37 @@ class PeopleEdit extends StatelessWidget {
               },
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: defaultPadding,
               child: Text(
                 'People type',
                 style: Theme.of(context).textTheme.subtitle2,
               ),
             ),
-            Center(
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
               child: ToggleButtons(
+                  selectedColor: Colors.amber.shade400,
+                  constraints: BoxConstraints(maxWidth: maxWidthWidget),
                   onPressed: (index) {
                     peopleEditBloc.add(FormDataSubmitEvent(
                         peopleType: state.peopleTypes[index]));
                   },
                   children: _getpeopleTypes(state.peopleTypes),
-                  borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                  borderRadius: BorderRadius.all(defaultRadius),
                   isSelected: _getpeopleTypesIsSelected(
                       state.peopleTypes, state.peopleType)),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: defaultPadding,
               child: Text(
                 'Phones',
                 style: Theme.of(context).textTheme.subtitle2,
               ),
             ),
             Container(
-              padding: EdgeInsets.all(12.0),
+              padding: defaultPadding,
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                  borderRadius: BorderRadius.all(defaultRadius),
                   border: Border.all(
                     style: BorderStyle.solid,
                     color: Colors.black12,
@@ -102,21 +123,20 @@ class PeopleEdit extends StatelessWidget {
                   shape: BoxShape.rectangle),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: _getPhones(peopleEditBloc, state.phones,
-                    state.phoneTypes, state.addPhoneTypeIndex),
+                children: _getPhones(peopleEditBloc, state),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: defaultPadding,
               child: Text(
                 'Adresses',
                 style: Theme.of(context).textTheme.subtitle2,
               ),
             ),
             Container(
-              padding: EdgeInsets.all(12.0),
+              padding: defaultPadding,
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                  borderRadius: BorderRadius.all(defaultRadius),
                   border: Border.all(
                     style: BorderStyle.solid,
                     color: Colors.black12,
@@ -124,8 +144,7 @@ class PeopleEdit extends StatelessWidget {
                   shape: BoxShape.rectangle),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: _getAdresses(peopleEditBloc, state.addresses,
-                    state.addressTypes, state.addAddressTypeIndex),
+                children: _getAdresses(peopleEditBloc, state),
               ),
             ),
             ListTile(
@@ -148,9 +167,13 @@ class PeopleEdit extends StatelessWidget {
                 onPressed: () => _selectDate(context),
               ),
             ),
-            RaisedButton(
-              onPressed: () {},
-              child: Text(people == null ? 'Add a new people' : 'Save people'),
+            Align(
+              alignment: Alignment.centerRight,
+              child: RaisedButton(
+                onPressed: () {},
+                child:
+                    Text(people == null ? 'Add a new people' : 'Save people'),
+              ),
             ),
           ],
         ),
@@ -177,7 +200,7 @@ class PeopleEdit extends StatelessWidget {
     peopleTypes.forEach((type) {
       widgets.add(Padding(
         key: Key('peopleType${type.id}'),
-        padding: const EdgeInsets.all(8.0),
+        padding: defaultPadding,
         child: Text(type.name),
       ));
     });
@@ -195,11 +218,10 @@ class PeopleEdit extends StatelessWidget {
     return selecteds;
   }
 
-  List<Widget> _getPhones(PeopleEditBloc userEditBloc, List<Phone> phones,
-      List<PhoneType> phoneTypes, int addPhoneTypeIndex) {
+  List<Widget> _getPhones(PeopleEditBloc userEditBloc, PeopleFormState state) {
     final widgets = <Widget>[];
-    for (var i = 0; i < phones.length; i++) {
-      var phone = phones[i];
+    for (var i = 0; i < state.phones.length; i++) {
+      var phone = state.phones[i];
       widgets.add(ListTile(
         onTap: () {},
         title: Text(phone.number),
@@ -221,7 +243,7 @@ class PeopleEdit extends StatelessWidget {
               IconButton(
                   icon: Icon(Icons.delete),
                   onPressed: () {
-                    userEditBloc.add(PhoneRemoveEvent(phones[i]));
+                    userEditBloc.add(PhoneRemoveEvent(state.phones[i]));
                   }),
             ],
           ),
@@ -229,42 +251,42 @@ class PeopleEdit extends StatelessWidget {
       ));
     }
 
-    widgets.add(
-      ListTile(
-        title: TextFormField(
-          onChanged: (value) {
-            userEditBloc.add(AddPhoneChangeEvent(number: value));
-          },
-          decoration: InputDecoration(
-              labelText: 'Phone number',
-              hintText: 'Put the phone number',
-              icon: Icon(Icons.phone)),
-          textInputAction: TextInputAction.done,
-          keyboardType: TextInputType.phone,
-          validator: (value) {
-            if (value.isEmpty) {
-              return 'Please enter some text';
-            }
-            return null;
-          },
-        ),
-        subtitle: DropdownButton<int>(
-            isExpanded: true,
-            items: _getPhoneTypeWidgetList(phoneTypes),
-            value: addPhoneTypeIndex,
-            onChanged: (index) {
-              userEditBloc
-                  .add(AddPhoneChangeEvent(phoneType: phoneTypes[index]));
-            }),
-        trailing: IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              userEditBloc.add(AddPhoneSubmitEvent());
-            }),
-      ),
-    );
+    widgets.add(_getAddPhoneWidget(userEditBloc, state));
 
     return widgets;
+  }
+
+  Widget _getAddPhoneWidget(
+      PeopleEditBloc userEditBloc, PeopleFormState state) {
+    return ListTile(
+      title: TextFormField(
+        onChanged: (value) {
+          userEditBloc.add(AddPhoneChangeEvent(number: value));
+        },
+        decoration: InputDecoration(
+            labelText: 'Phone number',
+            hintText: 'Put the phone number',
+            icon: Icon(Icons.phone)),
+        textInputAction: TextInputAction.done,
+        keyboardType: TextInputType.phone,
+        validator: (value) {
+          return state.addPhoneError;
+        },
+      ),
+      subtitle: DropdownButton<int>(
+          isExpanded: true,
+          items: _getPhoneTypeWidgetList(state.phoneTypes),
+          value: state.addPhoneTypeIndex,
+          onChanged: (index) {
+            userEditBloc
+                .add(AddPhoneChangeEvent(phoneType: state.phoneTypes[index]));
+          }),
+      trailing: IconButton(
+          icon: Icon(Icons.add),
+          onPressed: () {
+            userEditBloc.add(AddPhoneSubmitEvent());
+          }),
+    );
   }
 
   List<DropdownMenuItem<int>> _getPhoneTypeWidgetList(
@@ -280,13 +302,10 @@ class PeopleEdit extends StatelessWidget {
   }
 
   List<Widget> _getAdresses(
-      PeopleEditBloc userEditBloc,
-      List<Address> addresses,
-      List<AddressType> addressTypes,
-      int addAddressTypeIndex) {
+      PeopleEditBloc userEditBloc, PeopleFormState state) {
     final widgets = <Widget>[];
-    for (var i = 0; i < addresses.length; i++) {
-      var adress = addresses[i];
+    for (var i = 0; i < state.addresses.length; i++) {
+      var adress = state.addresses[i];
       widgets.add(ListTile(
         onTap: () {},
         title: Text(adress.location),
@@ -308,7 +327,7 @@ class PeopleEdit extends StatelessWidget {
               IconButton(
                   icon: Icon(Icons.delete),
                   onPressed: () {
-                    userEditBloc.add(AddressRemoveEvent(addresses[i]));
+                    userEditBloc.add(AddressRemoveEvent(state.addresses[i]));
                   }),
             ],
           ),
@@ -316,42 +335,42 @@ class PeopleEdit extends StatelessWidget {
       ));
     }
 
-    widgets.add(
-      ListTile(
-        title: TextFormField(
-          onChanged: (value) {
-            userEditBloc.add(AddAddressChangeEvent(location: value));
-          },
-          decoration: InputDecoration(
-              labelText: 'Address',
-              hintText: 'Put the address',
-              icon: Icon(Icons.phone)),
-          textInputAction: TextInputAction.done,
-          keyboardType: TextInputType.phone,
-          validator: (value) {
-            if (value.isEmpty) {
-              return 'Please enter some text';
-            }
-            return null;
-          },
-        ),
-        subtitle: DropdownButton<int>(
-            isExpanded: true,
-            items: _getAddressTypeWidgetList(addressTypes),
-            value: addAddressTypeIndex,
-            onChanged: (index) {
-              userEditBloc
-                  .add(AddAddressChangeEvent(addressType: addressTypes[index]));
-            }),
-        trailing: IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              userEditBloc.add(AddAddressSubmitEvent());
-            }),
-      ),
-    );
+    widgets.add(_getAddAddressWidget(userEditBloc, state));
 
     return widgets;
+  }
+
+  Widget _getAddAddressWidget(
+      PeopleEditBloc userEditBloc, PeopleFormState state) {
+    return ListTile(
+      title: TextFormField(
+        onChanged: (value) {
+          userEditBloc.add(AddAddressChangeEvent(location: value));
+        },
+        decoration: InputDecoration(
+            labelText: 'Address',
+            hintText: 'Put the address',
+            icon: Icon(Icons.phone)),
+        textInputAction: TextInputAction.done,
+        keyboardType: TextInputType.phone,
+        validator: (value) {
+          return state.addAddressError;
+        },
+      ),
+      subtitle: DropdownButton<int>(
+          isExpanded: true,
+          items: _getAddressTypeWidgetList(state.addressTypes),
+          value: state.addAddressTypeIndex,
+          onChanged: (index) {
+            userEditBloc.add(
+                AddAddressChangeEvent(addressType: state.addressTypes[index]));
+          }),
+      trailing: IconButton(
+          icon: Icon(Icons.add),
+          onPressed: () {
+            userEditBloc.add(AddAddressSubmitEvent());
+          }),
+    );
   }
 
   List<DropdownMenuItem<int>> _getAddressTypeWidgetList(
@@ -359,27 +378,10 @@ class PeopleEdit extends StatelessWidget {
     var dropdownMenuItems = <DropdownMenuItem<int>>[];
     for (var i = 0; i < addressTypes.length; i++) {
       dropdownMenuItems.add(DropdownMenuItem<int>(
-          key: Key('AddressType${addressTypes[i].id}'),
+          key: Key(addressTypes[i].toString()),
           child: Text(addressTypes[i].name),
           value: i));
     }
     return dropdownMenuItems;
   }
 }
-
-/* class _UserEditState extends State<UserEdit> {
-
-
-  _UserEditState(User user)
-      : _isNewUser = user.id == null,
-        id = user.id {
-    _name = user.name;
-    _peopleType = user.peopleType;
-    _birthday = user.birthday;
-    _phones = user.phones;
-    _addresses = user.addresses;
-  }
-
-  @override
-  Widget build(BuildContext context) {}
-} */

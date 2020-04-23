@@ -33,6 +33,5 @@ class Address extends Equatable {
   List<Object> get props => [id, location, addressType, note];
 
   @override
-  String toString() =>
-      'Address { id: $id, location: $location, addressType: ${addressType.toString()}, note: $note }';
+  bool get stringify => true;
 }

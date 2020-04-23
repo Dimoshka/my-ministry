@@ -14,17 +14,17 @@ class PeopleEditBloc extends Bloc<PeopleEditEvent, PeopleEditState>
   PeopleType _peopleType;
   DateTime _birthday;
 
-  List<PeopleType> _peopleTypes = [];
-  List<PhoneType> _phoneTypes = [];
-  List<AddressType> _addressTypes = [];
+  final List<PeopleType> _peopleTypes = [];
+  final List<PhoneType> _phoneTypes = [];
+  final List<AddressType> _addressTypes = [];
 
-  List<Phone> _phones = [];
-  List<Address> _addresses = [];
+  final List<Phone> _phones = [];
+  final List<Address> _addresses = [];
 
   Phone _addPhone = Phone.empty();
-  int _addPhoneTypeIndex = 0;
+  int _addPhoneTypeIndex;
   Address _addAddress = Address.empty();
-  int _addAddressTypeIndex = 0;
+  int _addAddressTypeIndex;
 
   @override
   PeopleEditState get initialState => LoadingState();
@@ -33,81 +33,83 @@ class PeopleEditBloc extends Bloc<PeopleEditEvent, PeopleEditState>
   Stream<PeopleEditState> mapEventToState(PeopleEditEvent event) async* {
     if (event is LoadDataEvent) {
       yield* loadData();
-      //return;
     } else if (event is FormDataSubmitEvent) {
-      yield editFormData(event);
-      //return;
+      yield _getFormDataSubmitEventState(event);
     } else if (event is PhoneRemoveEvent) {
       _phones.removeWhere((element) => element.id == event.phone.id);
-      yield _getUserFormState();
-      //return;
+      yield _createPeopleEditState();
     } else if (event is AddressRemoveEvent) {
       _addresses.removeWhere((element) => element.id == event.address.id);
-      yield _getUserFormState();
-      //return;
+      yield _createPeopleEditState();
     } else if (event is AddPhoneChangeEvent) {
       _addPhoneTypeIndex = _getPhoneTypeIndex(event.phoneType);
       _addPhone = _addPhone.clone(
           numberNew: event.number,
           phoneTypeNew: event.phoneType,
           noteNew: event.note);
-      yield _getUserFormState();
-      //return;
+      yield _createPeopleEditState();
     } else if (event is AddAddressChangeEvent) {
       _addAddressTypeIndex = _getAddressTypeIndex(event.addressType);
       _addAddress = _addAddress.clone(
           locationNew: event.location,
           addressTypeNew: event.addressType,
           noteNew: event.note);
-      yield _getUserFormState();
-      //return;
-    } else if (event is AddPhoneChangeEvent) {
-      _phones.add(_addPhone);
-      _addPhone = Phone.empty();
-      yield _getUserFormState();
-      //return;
+      yield _createPeopleEditState();
+    } else if (event is AddPhoneSubmitEvent) {
+      if (_addPhone.number != null &&
+          _addPhone.number.isNotEmpty &&
+          _addPhone.phoneType != null &&
+          validatePhoneNumber(_addPhone.number)) {
+        _phones.add(_addPhone);
+        _addPhone = Phone.empty();
+        _addPhoneTypeIndex = null;
+        yield _createPeopleEditState();
+      } else {
+        yield _createPeopleEditState(
+            addPhoneError: 'Phone number or type not valid!');
+      }
     } else if (event is AddAddressSubmitEvent) {
-      _addresses.add(_addAddress);
-      _addAddress = Address.empty();
-      yield _getUserFormState();
-      return;
+      if (_addAddress.location != null &&
+          _addAddress.location.isNotEmpty &&
+          _addAddress.addressType != null) {
+        _addresses.add(_addAddress);
+        _addAddress = Address.empty();
+        _addAddressTypeIndex = null;
+        yield _createPeopleEditState();
+      } else {
+        yield _createPeopleEditState(
+            addPhoneError: 'Address location or type not valid!');
+      }
     } else if (event is FormSubmitEvent) {
       //return;
     }
   }
 
   int _getPhoneTypeIndex(PhoneType phoneType) {
+    if (phoneType == null) {
+      return null;
+    }
     for (var i = 0; i < _phoneTypes.length; i++) {
       if (_phoneTypes[i].id == phoneType.id) {
         return i;
       }
     }
-    return -1;
+    return null;
   }
 
   int _getAddressTypeIndex(AddressType addressType) {
+    if (addressType == null) {
+      return null;
+    }
     for (var i = 0; i < _addressTypes.length; i++) {
       if (_addressTypes[i].id == addressType.id) {
         return i;
       }
     }
-    return -1;
+    return null;
   }
 
-  UserFormState editFormData(FormDataSubmitEvent event) {
-    if (event.name != null) {
-      _name = event.name;
-    }
-    if (event.birthday != null) {
-      _birthday = event.birthday;
-    }
-    if (event.peopleType != null) {
-      _peopleType = event.peopleType;
-    }
-    return _getUserFormState();
-  }
-
-  Stream<UserFormState> loadData() async* {
+  Stream<PeopleFormState> loadData() async* {
     var peopleTypes = await _usecases.peopleUsecases.getPeopleTypes().first;
     _peopleTypes.clear();
     _peopleTypes.addAll(peopleTypes);
@@ -119,27 +121,56 @@ class PeopleEditBloc extends Bloc<PeopleEditEvent, PeopleEditState>
     var addressTypes = await _usecases.peopleUsecases.getAddressTypes().first;
     _addressTypes.clear();
     _addressTypes.addAll(addressTypes);
-    yield _getUserFormState();
+    yield _createPeopleEditState();
 
     _usecases.peopleUsecases.getPeopleTypes().listen((types) async* {
       _peopleTypes.clear();
       _peopleTypes.addAll(types);
-      yield _getUserFormState();
+      yield _createPeopleEditState();
     });
     _usecases.peopleUsecases.getPhoneTypes().listen((types) async* {
       _phoneTypes.clear();
       _phoneTypes.addAll(types);
-      yield _getUserFormState();
+      yield _createPeopleEditState();
     });
     _usecases.peopleUsecases.getAddressTypes().listen((types) async* {
       _addressTypes.clear();
       _addressTypes.addAll(types);
-      yield _getUserFormState();
+      yield _createPeopleEditState();
     });
   }
 
-  UserFormState _getUserFormState() {
-    return UserFormState(_peopleType, _birthday, _phones, _addresses, _peopleTypes,
-        _phoneTypes, _addressTypes);
+  PeopleFormState _getFormDataSubmitEventState(FormDataSubmitEvent event) {
+    if (event.name != null) {
+      _name = event.name;
+    }
+    if (event.birthday != null) {
+      _birthday = event.birthday;
+    }
+    if (event.peopleType != null) {
+      _peopleType = event.peopleType;
+    }
+    return _createPeopleEditState();
+  }
+
+  PeopleFormState _createPeopleEditState(
+      {String nameError,
+      String peopleTypeError,
+      String addPhoneError,
+      String addAddressError}) {
+    return PeopleFormState(
+        _peopleType,
+        _birthday,
+        _phones,
+        _addresses,
+        _peopleTypes,
+        _phoneTypes,
+        _addressTypes,
+        _addPhoneTypeIndex,
+        _addAddressTypeIndex,
+        nameError: nameError,
+        peopleTypeError: peopleTypeError,
+        addPhoneError: addPhoneError,
+        addAddressError: addAddressError);
   }
 }
