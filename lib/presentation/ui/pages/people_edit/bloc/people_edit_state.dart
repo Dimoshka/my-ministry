@@ -13,6 +13,8 @@ abstract class PeopleEditState extends Equatable {
 
 class LoadingState extends PeopleEditState {}
 
+class SuccessState extends PeopleEditState {}
+
 class PeopleFormState extends PeopleEditState {
   /// Main data
   final PeopleType peopleType;

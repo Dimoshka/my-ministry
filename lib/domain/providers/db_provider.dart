@@ -24,6 +24,14 @@ class DbProvider {
     }).asBroadcastStream();
   }
 
+    Future<void> savePeople(People people) async {
+    if (people == null && people.id == null) {
+      return Future.error('Wrong people data!');
+    } else {
+      return _db.deletePeople(people.id);
+    }
+  }
+
   Future<void> deletePeople(People people) async {
     if (people == null && people.id == null) {
       return Future.error('Wrong people data!');
@@ -32,7 +40,7 @@ class DbProvider {
     }
   }
 
-  Stream<List<PeopleType>> getpeopleTypes() {
+  Stream<List<PeopleType>> getPeopleTypes() {
     return _db.getPeopleTypes().map((types) {
       var newTypes = <PeopleType>[];
       types.forEach((type) {

@@ -19,9 +19,9 @@ class Usecases {
 
 abstract class IPeopleUsecases {
   Stream<List<People>> getPeoples();
+  Future<void> savePeople(People people);
   Future<void> deletePeople(People people);
   Stream<List<PeopleType>> getPeopleTypes();
   Stream<List<PhoneType>> getPhoneTypes();
   Stream<List<AddressType>> getAddressTypes();
-  StreamZip<List<dynamic>> getTypes();
 }

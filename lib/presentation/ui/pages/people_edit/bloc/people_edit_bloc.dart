@@ -7,8 +7,9 @@ import 'package:my_ministry/presentation/utils/form_validator_mixin.dart';
 class PeopleEditBloc extends Bloc<PeopleEditEvent, PeopleEditState>
     with FormValidatorMixin {
   final Usecases _usecases;
+  final People _people;
 
-  PeopleEditBloc(this._usecases);
+  PeopleEditBloc(this._usecases, this._people);
 
   String _name;
   PeopleType _peopleType;
@@ -81,7 +82,20 @@ class PeopleEditBloc extends Bloc<PeopleEditEvent, PeopleEditState>
             addPhoneError: 'Address location or type not valid!');
       }
     } else if (event is FormSubmitEvent) {
-      //return;
+      if (_name != null && _name.isNotEmpty && _peopleType != null) {
+        var id = _people != null ? _people.id : null;
+        await _usecases.peopleUsecases.savePeople(People(id, _name, _peopleType,
+            birthday: _birthday, phones: _phones, addresses: _addresses));
+        yield SuccessState();
+      } else {
+        if (_peopleType != null) {
+          yield _createPeopleEditState(
+              nameError: 'The name should not be empty!');
+        } else {
+          yield _createPeopleEditState(
+              peopleTypeError: 'The people type should be selected!');
+        }
+      }
     }
   }
 

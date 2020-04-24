@@ -1,4 +1,3 @@
-import 'package:async/src/stream_zip.dart';
 import 'package:my_ministry/domain/entities/entities.dart';
 import 'package:my_ministry/domain/entities/people.dart';
 import 'package:my_ministry/domain/entities/people_type.dart';
@@ -20,6 +19,12 @@ class PeopleUsecase extends IPeopleUsecases {
     });
   }
 
+    @override
+  Future<void> savePeople(People people) {
+    // TODO: implement savePeople
+    throw UnimplementedError();
+  }
+
   @override
   Future<void> deletePeople(People people) {
     return _dbProvider.deletePeople(people);
@@ -37,11 +42,6 @@ class PeopleUsecase extends IPeopleUsecases {
 
   @override
   Stream<List<PeopleType>> getPeopleTypes() {
-    return _dbProvider.getpeopleTypes();
-  }
-
-  @override
-  StreamZip<List<dynamic>> getTypes() {
-    return StreamZip([getPeopleTypes(), getPhoneTypes(), getAddressTypes()]);
+    return _dbProvider.getPeopleTypes();
   }
 }

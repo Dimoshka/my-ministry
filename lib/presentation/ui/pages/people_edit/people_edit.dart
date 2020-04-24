@@ -17,7 +17,7 @@ class PeopleEdit extends StatelessWidget {
     var useCases = Provider.of<Usecases>(context);
     return BlocProvider<PeopleEditBloc>(
       create: (BuildContext context) =>
-          PeopleEditBloc(useCases)..add(LoadDataEvent()),
+          PeopleEditBloc(useCases, people)..add(LoadDataEvent()),
       child: Scaffold(
         appBar: AppBar(
           title: Text(people == null ? 'New people' : people.name),
